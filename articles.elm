@@ -5,26 +5,31 @@ main =
   Html.beginnerProgram { model = model, view = view, update = update }
 
 -- MODEL
-type alias Article = {title: String, content: String, isOpen: Bool}
+type alias Article = {id: Int, title: String, content: String, isOpen: Bool}
 type alias Model = List Article
 
 model : Model
 model =
-  [ {title = "My first article", content = "My first content", isOpen = False}
-  , {title = "My second article", content = "My second content", isOpen = False}
-  , {title = "My third article", content = "My third content", isOpen = False}
+  [ {id = 1 ,title = "My first article", content = "My first content", isOpen = False}
+  , {id = 2 ,title = "My second article", content = "My second content", isOpen = False}
+  , {id = 3 ,title = "My third article", content = "My third content", isOpen = False}
   ]
 
 -- Update
-type Msg = Open | Close
+type Msg = Toggle Int Bool
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Open ->
-      []
-    Close ->
-      []
+    Toggle id isOpen ->
+      let
+        updateArticle t =
+          if t.id == id then
+            { t | isOpen = isOpen }
+          else
+            t
+      in
+        List.map updateArticle model
 
 -- View
 view : Model -> Html Msg
@@ -50,13 +55,13 @@ renderArticle article =
     text article.title
     , br [] []
     , if article.isOpen then text article.content else text "" --TODO
-    , renderArticleButton article.isOpen
+    , div [] [ renderArticleButton article ]
     ]
 
-renderArticleButton: Bool -> Html Msg
-renderArticleButton isOpen =
-  if isOpen
+renderArticleButton: Article -> Html Msg
+renderArticleButton article =
+  if article.isOpen
     then
-      button [ onClick Close ] [ text "Close" ]
+      button [ onClick (Toggle article.id False) ] [ text "Close" ]
     else
-      button [ onClick Open ] [ text "Open" ]
+      button [ onClick (Toggle article.id True) ] [ text "Open" ]
