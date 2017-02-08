@@ -1,16 +1,18 @@
-import Html exposing (Html, div, h1, ul, li, text)
+import Html exposing (Html, div, h1, ul, li, text, br, button)
+import Html.Events exposing (onClick)
 
 main =
   Html.beginnerProgram { model = model, view = view, update = update }
 
 -- MODEL
-type alias Model = List String
+type alias Article = {title: String, content: String, isOpen: Bool}
+type alias Model = List Article
 
 model : Model
 model =
-  [ "My first article"
-  , "My second article"
-  , "My third article"
+  [ {title = "My first article", content = "My first content", isOpen = False}
+  , {title = "My second article", content = "My second content", isOpen = False}
+  , {title = "My third article", content = "My third content", isOpen = False}
   ]
 
 -- Update
@@ -42,6 +44,19 @@ renderArticles model =
   in
     ul [] articles
 
-renderArticle: String -> Html Msg
+renderArticle: Article -> Html Msg
 renderArticle article =
-  li [] [ text article ]
+  li [] [
+    text article.title
+    , br [] []
+    , if article.isOpen then text article.content else text "" --TODO
+    , renderArticleButton article.isOpen
+    ]
+
+renderArticleButton: Bool -> Html Msg
+renderArticleButton isOpen =
+  if isOpen
+    then
+      button [ onClick Close ] [ text "Close" ]
+    else
+      button [ onClick Open ] [ text "Open" ]
